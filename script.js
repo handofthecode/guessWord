@@ -16,13 +16,8 @@ var $apples = $('#apples');
 var $message = $('#message');
 var $newGame = $('#new_game');
 
-function Game() {
-  this.currentWord = randomWord().split('');
-  this.chances = 6;
-  this.init();
-}
-
-Game.prototype = {
+var Game = {
+  chances: 6,
   resetScreen: function() {
     $word.html('');
     $guesses.html('');
@@ -54,15 +49,12 @@ Game.prototype = {
     this.currentWord.forEach(function(char, i) {
       if (char === choice) $word.children('div')[i].innerText = choice;
     });
-    if ($word.children('div').toArray().every(function(div) {return div.innerText.match(/\w/)})) this.win();
+    if ($word.children('div').toArray().every(div => div.innerText.match(/\w/))) this.win();
   },
   incorrect: function(choice) {
     this.chances--;
     this.subtractApple();
     if (this.chances === 0) this.lose();
-    return function() {
-      this.chances;
-    }();
   },
   subtractApple: function() {
     var guessNum = String(6 - this.chances);
@@ -93,6 +85,7 @@ Game.prototype = {
     $(document).on('keyup', this.handleGuess.bind(this));
   },
   init: function() {
+    this.currentWord = randomWord().split('');
     if (this.currentWord.length === 0) this.outOfWords();
     else {
       this.resetScreen();
@@ -103,9 +96,9 @@ Game.prototype = {
   }
 }
 
-new Game();
+Object.create(Game).init();
 
 $newGame.on('click', function(e) { 
   e.preventDefault();
-  new Game;
+  Object.create(Game).init();
 });
